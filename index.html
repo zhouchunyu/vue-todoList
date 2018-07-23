@@ -1,0 +1,77 @@
+<html>
+   <head>
+      <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+      <title>Get Things Done!)</title>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+        }
+        main {
+          max-width: 666px;
+          margin: auto;
+        }
+        
+        .newTodo {
+          margin: 30px auto 0;
+        }
+        .todos {
+          margin-top: 30px
+        }
+        .todos li {
+          padding: 10px;
+        }
+
+      </style>
+   </head>
+   <body>
+     <main>
+        <div id="app">
+            <div class="newTodo">
+              待办事项: <input type="text" v-model="newTodo.title" @keypress.enter="addTodo">
+            </div>
+            <ol class="todos">
+              <li v-for="todo in todoList.filter((todo) => !todo.done)">
+                <input type="checkbox" v-model="todo.done">{{ todo.done ? '完成': '未完成'}}: {{ todo.title }}, 创建时间: {{ todo.created_at}}
+                <button @click="removeTodo(todo)">删除</button>
+              </li>
+              <li v-for="todo in todoList.filter((todo) => todo.done)">
+                <input type="checkbox" v-model="todo.done">{{ todo.done ? '完成': '未完成'}}: {{ todo.title }}, 创建时间: {{ todo.created_at}}
+                <button @click="removeTodo(todo)">删除</button>
+              </li>
+            </ol>
+          </div>
+     </main>
+      <script>
+        var app = new Vue({
+          el: '#app',
+          data: {
+            newTodo: {
+              title: '',
+              done: false,
+              created_at: new Date(),
+            },
+            todoList: []
+          },
+          created: function(){
+            window.onbeforeunload = () => {
+              let dataString = JSON.stringify(this.todoList);
+              window.localStorage.setItem('myTodos', dataString);
+            }
+            let dataString =  window.localStorage.getItem('myTodos');
+            this.todoList = JSON.parse(dataString) || [];
+          },
+          methods: { addTodo: function(){
+              this.todoList.push({...this.newTodo});
+              this.newTodo.title = '';
+            },
+            removeTodo: function(todo){
+              let index = this.todoList.indexOf(todo);
+              this.todoList.splice(index, 1);
+            },
+          }
+        })        
+      </script>
+     <!-- <script src="dist/bundle.js"></script> -->
+   </body>
+ </html>
